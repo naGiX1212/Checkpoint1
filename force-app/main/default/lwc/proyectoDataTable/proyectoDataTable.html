@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Proyectos Asociados" icon-name="standard:case">
+        <template if:true={showButton}>
+        <lightning-button label="Eliminar Seleccionados" variant="destructive" onclick={handleDeleteSelection}></lightning-button>
+        </template>
+        <div style="height: 300px;">
+            <lightning-datatable
+                key-field="Id"
+                data={allProyectos}
+                columns={columns}
+                onrowselection={handleRowSelection}
+                selected-rows={selectorIds}
+                >
+            </lightning-datatable>
+        </div>
+    </lightning-card>
+</template>

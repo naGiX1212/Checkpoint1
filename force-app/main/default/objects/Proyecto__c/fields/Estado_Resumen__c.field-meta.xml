@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Estado_Resumen__c</fullName>
+    <description>Evalúa el estado del proyecto y su proximidad a la fecha de inicio</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    ISPICKVAL(Estado__c, &quot;Finalizado&quot;),
+    &quot;Proyecto Completado&quot;,
+    IF(
+        AND(
+            TODAY() &gt;= Fecha_de_inicio__c,
+            ISPICKVAL(Estado__c, &quot;En Progreso&quot;)
+        ),
+        &quot;Proyecto Activo&quot;,
+        &quot;Pendiente de Inicio&quot;
+    )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Estado Resumen</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

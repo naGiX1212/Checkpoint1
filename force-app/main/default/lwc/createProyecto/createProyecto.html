@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Nuevo Proyecto">
+        <div slot="actions">
+            <template if:true={recordId}>
+                <lightning-button label="Nuevo" variant="brand" onclick={handleClick}></lightning-button>
+            </template>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <template if:true={isFormVisible}> 
+                <lightning-record-form
+                    object-api-name={objectApiName}
+                    fields={fields}
+                    onsuccess={successHandler}>
+                </lightning-record-form>
+            </template>
+        </div>
+    </lightning-card>
+</template>

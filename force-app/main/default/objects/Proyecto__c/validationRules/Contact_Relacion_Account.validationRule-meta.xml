@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contact_Relacion_Account</fullName>
+    <active>true</active>
+    <errorConditionFormula>Contact__r.AccountId  &lt;&gt;  Account__r.Id</errorConditionFormula>
+    <errorDisplayField>Contact__c</errorDisplayField>
+    <errorMessage>Solo se pueden seleccionar contactos asociados a la cuenta del proyecto.</errorMessage>
+</ValidationRule>
