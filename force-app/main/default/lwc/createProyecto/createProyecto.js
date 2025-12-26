@@ -19,7 +19,6 @@ export default class CreateAccount extends LightningElement {
     isFormVisible = true;
     successHandler(event) {
         this.recordId = event.detail.id;
-        // Notificamos al padre para que refresque la tabla
         this.dispatchEvent(new CustomEvent('creation'));
     }
 
@@ -27,10 +26,6 @@ export default class CreateAccount extends LightningElement {
         // Reset manual forzando re-render
         this.isFormVisible = false;
         this.recordId = undefined;
-        
-        // eslint-disable-next-line @lwc/lwc/no-async-operation
-        setTimeout(() => {
-            this.isFormVisible = true;
-        }, 5);
+        this.isFormVisible = true;
     }
 }

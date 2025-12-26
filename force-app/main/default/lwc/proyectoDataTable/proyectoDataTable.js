@@ -65,6 +65,7 @@ export default class ProyectoDataTable extends LightningElement {
             accId: this.recordId || null 
         };
     }
+    //OBTENGO LOS PROY
   get allProyectos() { 
         const dataSalesforce = this._data?.uiapi?.query?.Proyecto__c?.edges;
         const lista = [];
@@ -84,11 +85,13 @@ export default class ProyectoDataTable extends LightningElement {
         return lista;
 
     }
+    //EVENTO AL SELECCIONAR ROWS EN LA DATA TABLE
     handleRowSelection(event) {
         const selectedRows = event.detail.selectedRows;
         this.selectorIds = selectedRows.map(row => row.Id);
         
     }
+    //ELIMINAR SELECCIONADOS 
     async handleDeleteSelection() {
         if (this.selectorIds.length === 0) return;
 
