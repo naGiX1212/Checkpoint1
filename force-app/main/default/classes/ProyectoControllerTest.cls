@@ -26,45 +26,45 @@ private class ProyectoControllerTest {
     static void makeData(){
          User admin = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()];
         System.runAs(admin){
-        Profile p = [SELECT Id FROM Profile WHERE Name IN ('System Administrator') LIMIT 1];
-        User u = new User(
-                Alias = 'test',
-                Email = 'testuser@example.com',
-                EmailEncodingKey = 'UTF-8',
-                LastName = 'asd',
-                LanguageLocaleKey = 'en_US',
-                LocaleSidKey = 'en_US',
-                ProfileId = p.Id,
-                TimeZoneSidKey = 'America/Los_Angeles',
-                UserName = 'test' + DateTime.now().getTime() + '@test.com'
+            Profile p = [SELECT Id FROM Profile WHERE Name IN ('System Administrator') LIMIT 1];
+            User u = new User(
+                    Alias = 'test',
+                    Email = 'testuser@example.com',
+                    EmailEncodingKey = 'UTF-8',
+                    LastName = 'asd',
+                    LanguageLocaleKey = 'en_US',
+                    LocaleSidKey = 'en_US',
+                    ProfileId = p.Id,
+                    TimeZoneSidKey = 'America/Los_Angeles',
+                    UserName = 'test' + DateTime.now().getTime() + '@test.com'
+                );
+                User u2 = new User(
+                    Alias = 'test2',
+                    Email = 'test2user@example.com',
+                    EmailEncodingKey = 'UTF-8',
+                    LastName = 'asd',
+                    LanguageLocaleKey = 'en_US',
+                    LocaleSidKey = 'en_US',
+                    ProfileId = p.Id,
+                    TimeZoneSidKey = 'America/Los_Angeles',
+                    UserName = 'test2' + DateTime.now().getTime() + '@test.com'
+                );
+                List<User> users = new List<User>{u,u2};
+                insert users;
+                PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'Bypass_Validation_Rules' LIMIT 1];
+                insert new PermissionSetAssignment(
+                    AssigneeId = u.Id,
+                    PermissionSetId = ps.Id
+                );
+            Account acct = new Account(
+            Name = 'AccountTest'
             );
-            User u2 = new User(
-                Alias = 'test2',
-                Email = 'test2user@example.com',
-                EmailEncodingKey = 'UTF-8',
-                LastName = 'asd',
-                LanguageLocaleKey = 'en_US',
-                LocaleSidKey = 'en_US',
-                ProfileId = p.Id,
-                TimeZoneSidKey = 'America/Los_Angeles',
-                UserName = 'test2' + DateTime.now().getTime() + '@test.com'
+            insert acct;
+            Contact cont = new Contact(
+                LastName = 'ContactTest',
+                AccountId = acct.Id
             );
-            insert u;
-            insert u2;
-            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'Bypass_Validation_Rules' LIMIT 1];
-            insert new PermissionSetAssignment(
-                AssigneeId = u.Id,
-                PermissionSetId = ps.Id
-            );
-        Account acct = new Account(
-        Name = 'AccountTest'
-        );
-        insert acct;
-        Contact cont = new Contact(
-            LastName = 'ContactTest',
-            AccountId = acct.Id
-        );
-        insert cont;
+            insert cont;
         }
     }
     @IsTest

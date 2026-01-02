@@ -1,6 +1,7 @@
 public with sharing class TriggerProyectoHandler {
     //Actualiza la descripcion en el caso de que el contacto tenga un presupuesto mayor a 50000
-    public static void afterInsertOrUpdate(List<Proyecto__c> proyectos){
+    //after insert or update
+    public static void updateDescripcion(List<Proyecto__c> proyectos){
         Map<Id,Contact> cont = new Map<Id,Contact>();
         for(Proyecto__c pro : proyectos){
             if(pro.Presupuesto__c > 50000){
@@ -15,7 +16,8 @@ public with sharing class TriggerProyectoHandler {
     }
     //Se encargar de verificar que la cantidad de proyectos activos no supere el limite de proyectos activos de la cuenta
     //Se toman en cuenta solo los 'En progreso'
-    public static void validarLimiteProyectos(List<Proyecto__c> nuevosProyectos) {
+    //before insert
+    public static void validateProyectoLimite(List<Proyecto__c> nuevosProyectos) {
         Set<Id> idsAccountProgreso = new Set<Id>();
         List<Proyecto__c> proyectosProgreso = new List<Proyecto__c>();
         for(Proyecto__c proyItem : nuevosProyectos){
@@ -45,7 +47,7 @@ public with sharing class TriggerProyectoHandler {
     }
     //Funcion del beforeDelete, que se encargar de validar que los proyectos que se van a eliminar cumplan con las condiciones
     //que esten en estado 'Planeado' y el anio de antiguedad del proyecto sea mayor a 1 anio
-    public static void beforeDelete(List<Proyecto__c> before) {
+    public static void deleteAntiguedadYEstadoPlaneado(List<Proyecto__c> before) {
         for(Proyecto__c proItem : before) {
             Boolean esAntiguoYPlaneado = proItem.Estado__c == 'Planeado' && proItem.Fecha_de_inicio__c != null && proItem.Fecha_de_inicio__c.year() <= Date.today().addYears(-1).year();
             if(!esAntiguoYPlaneado) {
@@ -54,7 +56,7 @@ public with sharing class TriggerProyectoHandler {
         }
     }
     //se supone que los unicos que puedo eliminar son los que cumplen antiguo y planeado , pero estos no cuentan para el preomedio , por ende al eliminar un proyecto el promedio no cambia
-    public static void afterDelete(List<Proyecto__c> ls){
+    public static void updatePromedioAfterDelete(List<Proyecto__c> ls){
         Set<Id> accountIds = getAccountsIds(ls);
         updateAccountPromedio(accountIds);
     }
