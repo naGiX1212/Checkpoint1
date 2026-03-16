@@ -3,7 +3,6 @@ import { gql, graphql } from "lightning/graphql";
 import deleteProyectoById from '@salesforce/apex/ProyectoController.deleteProyectoById'
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-
 const COLUMNS = [
     { label: 'Nombre Proyecto', fieldName: 'Name', type: 'text' },
     { label: 'Presupuesto', fieldName: 'Presupuesto', type: 'currency' },
@@ -12,9 +11,9 @@ const COLUMNS = [
 ];
 
 export default class ProyectoDataTable extends LightningElement {
-    @api recordId; 
+    @api recordId;
     @api
-     proyectoRefresh(){
+    proyectoRefresh(){
         this._refresh();
     }
 
@@ -23,32 +22,31 @@ export default class ProyectoDataTable extends LightningElement {
     _refresh;
     selectorIds=[]
     get showButton() {
-         return this.selectorIds && this.selectorIds.length > 0;
+        return this.selectorIds && this.selectorIds.length > 0;
     }
     @wire(graphql, {
         query: gql`
-            query GetProyectos($accId: ID) { 
+            query GetProyectos($accId: ID) {
                 uiapi {
                     query {
-                        Proyecto__c(where: { Account__c: { eq: $accId }},first:50) { 
+                        Proyecto__c(where: { Account__c: { eq: $accId }},first:50) {
                             edges {
                                 node {
                                     Id
                                     Name { value }
                                     Presupuesto__c { value }
                                     Estado__c { value }
-                                    Contact__r { 
-                                       Name { value }
-                                 }
+                                    Contact__r {
+                                        Name { value }
+                                    }
                                 }
-
                             }
                         }
                     }
                 }
             }
         `,
-        variables: '$graphqlVariables' 
+        variables: '$graphqlVariables'
     })
     proyectos({data,errors,refresh}){
         this._refresh = refresh;
@@ -62,36 +60,32 @@ export default class ProyectoDataTable extends LightningElement {
 
     get graphqlVariables() {
         return {
-            accId: this.recordId || null 
+            accId: this.recordId || null
         };
     }
     //OBTENGO LOS PROY
-  get allProyectos() { 
+    get allProyectos() {
         const dataSalesforce = this._data?.uiapi?.query?.Proyecto__c?.edges;
         const lista = [];
         if (!dataSalesforce) return [];
         for(const item of dataSalesforce){
-
-                const data = 
-                {
-                    Id: item.node.Id,
-                    Name: item.node.Name?.value,
-                    Presupuesto: item.node.Presupuesto__c?.value,
-                    Estado: item.node.Estado__c?.value,
-                    Contacto: item.node.Contact__r?.Name?.value
-                }
-                lista.push(data);
+            const data = {
+                Id: item.node.Id,
+                Name: item.node.Name?.value,
+                Presupuesto: item.node.Presupuesto__c?.value,
+                Estado: item.node.Estado__c?.value,
+                Contacto: item.node.Contact__r?.Name?.value
+            }
+            lista.push(data);
         }
         return lista;
-
     }
     //EVENTO AL SELECCIONAR ROWS EN LA DATA TABLE
     handleRowSelection(event) {
         const selectedRows = event.detail.selectedRows;
         this.selectorIds = selectedRows.map(row => row.Id);
-        
     }
-    //ELIMINAR SELECCIONADOS 
+    //ELIMINAR SELECCIONADOS
     async handleDeleteSelection() {
         if (this.selectorIds.length === 0) return;
 
@@ -104,32 +98,29 @@ export default class ProyectoDataTable extends LightningElement {
                 variant: 'success'
             }));
 
-            this.selectorIds = []; 
+            this.selectorIds = [];
             if (this._refresh) {
                 await this._refresh();
             }
-
-       } catch (error) {
-            
+        } catch (error) {
             let mensaje = 'Ocurrio un error inesperado';
 
             if (error.body && error.body.message) {
                 mensaje = error.body.message;
 
                 if (mensaje.includes('FIELD_CUSTOM_VALIDATION_EXCEPTION,')) {
-                    const  partes = mensaje.split('FIELD_CUSTOM_VALIDATION_EXCEPTION,');
+                    const partes = mensaje.split('FIELD_CUSTOM_VALIDATION_EXCEPTION,');
                     mensaje = partes[1].trim();
-                    mensaje = mensaje.replace(/: \[\]$/, ''); 
+                    mensaje = mensaje.replace(/: \[\]$/, '');
                 }
             }
 
             this.dispatchEvent(new ShowToastEvent({
                 title: 'No se pudo eliminar',
-                message: mensaje, 
+                message: mensaje,
                 variant: 'error',
-                mode: 'sticky' 
+                mode: 'sticky'
             }));
         }
     }
-
 }

@@ -1,6 +1,13 @@
+/**
+ * Handler de trigger para el objeto Proyecto__c,
+ */
 public with sharing class TriggerProyectoHandler {
-    //Actualiza la descripcion en el caso de que el contacto tenga un presupuesto mayor a 50000
-    //after insert or update
+    /**
+     * Actualiza la descripción de los contactos asociados a proyectos con presupuesto mayor a 50.000,
+     * y recalcula el promedio de las cuentas vinculadas a los proyectos recibidos.
+     *
+     * @param proyectos Lista de proyectos a procesar.
+     */
     public static void updateDescripcion(List<Proyecto__c> proyectos){
         Map<Id,Contact> cont = new Map<Id,Contact>();
         for(Proyecto__c pro : proyectos){
@@ -14,9 +21,10 @@ public with sharing class TriggerProyectoHandler {
         Set<Id> accountIds = getAccountsIds(proyectos);
         updateAccountPromedio(accountIds);
     }
-    //Se encargar de verificar que la cantidad de proyectos activos no supere el limite de proyectos activos de la cuenta
-    //Se toman en cuenta solo los 'En progreso'
-    //before insert
+    /**
+     * Valida que la cantidad de proyectos en progreso asociados a una cuenta no supere el limite establecido en el campo Maximo_de_proyectos_activos__c de la cuenta.
+     * @param nuevosProyectos Lista de proyectos a validar.
+     */
     public static void validateProyectoLimite(List<Proyecto__c> nuevosProyectos) {
         Set<Id> idsAccountProgreso = new Set<Id>();
         List<Proyecto__c> proyectosProgreso = new List<Proyecto__c>();
@@ -45,8 +53,11 @@ public with sharing class TriggerProyectoHandler {
             }
         }
     }
-    //Funcion del beforeDelete, que se encargar de validar que los proyectos que se van a eliminar cumplan con las condiciones
-    //que esten en estado 'Planeado' y el anio de antiguedad del proyecto sea mayor a 1 anio
+    /**
+     * Valida que los proyectos que se van a eliminar cumplan con las condiciones
+     * que esten en estado 'Planeado' y el anio de antiguedad del proyecto sea mayor a 1 anio
+     * @param before Lista de proyectos antes de la eliminación
+     */
     public static void deleteAntiguedadYEstadoPlaneado(List<Proyecto__c> before) {
         for(Proyecto__c proItem : before) {
             Boolean esAntiguoYPlaneado = proItem.Estado__c == 'Planeado' && proItem.Fecha_de_inicio__c != null && proItem.Fecha_de_inicio__c.year() <= Date.today().addYears(-1).year();
@@ -55,12 +66,18 @@ public with sharing class TriggerProyectoHandler {
             }
         }
     }
-    //se supone que los unicos que puedo eliminar son los que cumplen antiguo y planeado , pero estos no cuentan para el preomedio , por ende al eliminar un proyecto el promedio no cambia
+    /**
+     * Actualiza el promedio de la cuenta después de eliminar un proyecto
+     * @param ls Lista de proyectos eliminados
+     */
     public static void updatePromedioAfterDelete(List<Proyecto__c> ls){
         Set<Id> accountIds = getAccountsIds(ls);
         updateAccountPromedio(accountIds);
     }
-    //Acutaliza el promedio de la cuenta asoaciada al proyecto
+    /**
+     * Actualiza el promedio de la cuenta asociada al proyecto
+     * @param accountIds Conjunto de IDs de cuentas a actualizar
+     */
     public static void updateAccountPromedio(Set<Id> accountIds) {
         List<Account> accounts = new List<Account>();
         List<AggregateResult> promedios = [SELECT Account__c, AVG(Presupuesto__c) promedio
@@ -83,8 +100,12 @@ public with sharing class TriggerProyectoHandler {
             update as user accounts;
         }
     }
-    //Obtiene las ids de los proyectos;
-    public static Set<Id> getAccountsIds(List<Proyecto__c> ls){
+    /**
+     * Obtiene las ids de las cuentas asociadas a una lista de proyectos
+     * @param ls Lista de proyectos a procesar
+     * @return Conjunto de IDs de cuentas asociadas a los proyectos
+     */
+    private static Set<Id> getAccountsIds(List<Proyecto__c> ls){
         Set<Id> accountIds = new Set<Id>();
         for(Proyecto__c pro : ls){
             accountIds.add(pro.Account__c);
