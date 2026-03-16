@@ -78,7 +78,7 @@ public with sharing class TriggerProyectoHandler {
      * Actualiza el promedio de la cuenta asociada al proyecto
      * @param accountIds Conjunto de IDs de cuentas a actualizar
      */
-    public static void updateAccountPromedio(Set<Id> accountIds) {
+    private static void updateAccountPromedio(Set<Id> accountIds) {
         List<Account> accounts = new List<Account>();
         List<AggregateResult> promedios = [SELECT Account__c, AVG(Presupuesto__c) promedio
                                            FROM Proyecto__c
