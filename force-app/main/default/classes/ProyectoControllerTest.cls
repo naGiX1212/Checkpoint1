@@ -83,16 +83,16 @@ private class ProyectoControllerTest {
     /**
      * Prueba que un proyecto se elimine correctamente cuando cumple las condiciones requeridas.
      * Crea un proyecto en estado 'Planeado' con fecha de inicio hace 2 años y verifica
-     * que tras llamar a deleteProyectoById el registro ya no exista en la base de datos.
-     * @see ProyectoController.deleteProyectoById
+     * que tras llamar a deleteProjectById el registro ya no exista en la base de datos.
+     * @see ProyectoController.deleteProjectById
      */
     @IsTest
-    static void deleteProyectoByIdTestExito() {
+    static void deleteProjectByIdSuccessTest() {
         DeleteTestSetup setup = setupDeleteTest();
         Account acct = setup.acct;
         Contact cont = setup.cont;
         User u = setup.u;
-        Proyecto__c pro = new Proyecto__c(
+        Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto Test',
             Account__c = acct.Id,
             Contact__c = cont.Id,
@@ -100,29 +100,29 @@ private class ProyectoControllerTest {
             Estado__c = 'Planeado'
         );
         System.runAs(u) {
-            insert pro;
-            List<Id> ids = new List<Id>{ pro.Id };
+            insert project;
+            List<Id> ids = new List<Id>{ project.Id };
             Test.startTest();
-            ProyectoController.deleteProyectoById(ids);
+            ProyectoController.deleteProjectById(ids);
             Test.stopTest();
         }
-        List<Proyecto__c> resultados = [SELECT Id FROM Proyecto__c WHERE Id = :pro.Id];
-        Assert.areEqual(0, resultados.size(), 'El proyecto debería haber sido eliminado');
+        List<Proyecto__c> results = [SELECT Id FROM Proyecto__c WHERE Id = :project.Id];
+        Assert.areEqual(0, results.size(), 'El proyecto debería haber sido eliminado');
     }
 
     /**
      * Prueba que un proyecto no se elimine cuando no cumple las condiciones requeridas.
      * Crea un proyecto en estado 'Planeado' con fecha de inicio igual a hoy y verifica
-     * que deleteProyectoById lance una AuraHandledException al intentar eliminarlo.
-     * @see ProyectoController.deleteProyectoById
+     * que deleteProjectById lance una AuraHandledException al intentar eliminarlo.
+     * @see ProyectoController.deleteProjectById
      */
     @IsTest
-    static void deleteProyectoByIdTestFallido() {
+    static void deleteProjectByIdFailTest() {
         DeleteTestSetup setup = setupDeleteTest();
         Account acct = setup.acct;
         Contact cont = setup.cont;
         User u = setup.u;
-        Proyecto__c pro = new Proyecto__c(
+        Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto Test',
             Account__c = acct.Id,
             Contact__c = cont.Id,
@@ -130,13 +130,13 @@ private class ProyectoControllerTest {
             Estado__c = 'Planeado'
         );
         System.runAs(u) {
-            insert pro;
-            List<Id> ids = new List<Id>{ pro.Id };
+            insert project;
+            List<Id> ids = new List<Id>{ project.Id };
             Test.startTest();
             try {
-                ProyectoController.deleteProyectoById(ids);
-            } catch (AuraHandledException m) {
-                Assert.isNotNull(m.getMessage());
+                ProyectoController.deleteProjectById(ids);
+            } catch (AuraHandledException e) {
+                Assert.isNotNull(e.getMessage());
             }
             Test.stopTest();
         }

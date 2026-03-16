@@ -64,19 +64,19 @@ private class TriggerProyectoHandlerTest {
      * Verifica que la descripción del contacto se haya actualizado con el mensaje esperado.
      */
     @IsTest
-    static void updateDescripcionAlto(){
+    static void updateDescriptionHighBudgetTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
         Contact cont = conts[0];
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' WITH USER_MODE LIMIT 1];
         User u = users[0];
-        Proyecto__c proyecto = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id);
-        insert as user proyecto;
-        proyecto.Presupuesto__c = 550000;
+        Proyecto__c project = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id);
+        insert as user project;
+        project.Presupuesto__c = 550000;
         System.runAs(u){
             Test.startTest();
-            update proyecto;
+            update project;
             Test.stopTest();
         }
         List<Contact> updatedContacts = [SELECT Id,Descripcion__c FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
@@ -89,17 +89,17 @@ private class TriggerProyectoHandlerTest {
      * Verifica que la descripción del contacto no se haya actualizado con el mensaje esperado.
      */
     @IsTest
-    static void insertDescripcionDeContactoExitoso(){
+    static void insertContactDescriptionSuccessTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
         Contact cont = conts[0];
-        Proyecto__c proyecto = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id,Presupuesto__c = 60000);
+        Proyecto__c project = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id,Presupuesto__c = 60000);
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' WITH USER_MODE LIMIT 1];
         User u = users[0];
         System.runAs(u){
             Test.startTest();
-            insert as user proyecto;
+            insert as user project;
             Test.stopTest();
         }
         List<Contact> updatedContacts = [SELECT Id,Descripcion__c FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
@@ -112,17 +112,17 @@ private class TriggerProyectoHandlerTest {
      * Verifica que la descripción del contacto no se haya actualizado con el mensaje esperado.
      */
     @IsTest
-    static void updateDescripcionDeContactoFallido(){
+    static void updateContactDescriptionLowBudgetTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
         Contact cont = conts[0];
-        Proyecto__c proyecto = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id,Presupuesto__c = 5000);
+        Proyecto__c project = new Proyecto__c(Name = 'ProyectoTest',Account__c = acct.Id ,Contact__c = cont.Id,Presupuesto__c = 5000);
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' WITH USER_MODE LIMIT 1];
         User u = users[0];
         System.runAs(u){
             Test.startTest();
-            insert as user proyecto;
+            insert as user project;
             Test.stopTest();
         }
         List<Contact> updatedContacts = [SELECT Id,Descripcion__c FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
@@ -135,14 +135,14 @@ private class TriggerProyectoHandlerTest {
      * Verifica que el proyecto se haya eliminado correctamente y que el promedio de la cuenta se haya recalculado.
      */
     @IsTest
-    static void deleteProyectoBorradoExitoso(){
+    static void deleteProjectSuccessTest(){
         List<Account> accts = [SELECT Id, Presupuesto_promedio__c FROM Account WHERE Name = 'AccountTest' LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' LIMIT 1];
         Contact cont = conts[0];
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' LIMIT 1];
         User u = users[0];
-        List<Proyecto__c> proyectos = new List<Proyecto__c>{
+        List<Proyecto__c> projects = new List<Proyecto__c>{
             new Proyecto__c(
                 Name = 'Proyecto En Progreso1',
                 Account__c = acct.Id,
@@ -158,7 +158,7 @@ private class TriggerProyectoHandlerTest {
                 Presupuesto__c = 10000
             )
         };
-        Proyecto__c pro = new Proyecto__c(
+        Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
             Contact__C = cont.Id,
@@ -166,48 +166,48 @@ private class TriggerProyectoHandlerTest {
             Fecha_de_inicio__c = Date.today().addYears(-1)
         );
         System.runAs(u){
-            insert proyectos;
+            insert projects;
             List<Account> acctsBefore = [SELECT Id, Presupuesto_promedio__c FROM Account WHERE Id = :acct.Id WITH USER_MODE LIMIT 1];
-            Account acctBeforeDelete = acctsBefore[0];
-            Assert.isTrue(acctBeforeDelete.Presupuesto_promedio__c != null, 'Debió establecerse un promedio antes del borrado');
-            insert pro;
+            Account accountBeforeDelete = acctsBefore[0];
+            Assert.isTrue(accountBeforeDelete.Presupuesto_promedio__c != null, 'Debió establecerse un promedio antes del borrado');
+            insert project;
             Test.startTest();
-            delete pro;
+            delete project;
             Test.stopTest();
         }
-        List<Proyecto__c> listaResultado = [SELECT Id FROM Proyecto__c WHERE Id = :pro.Id];
-        Assert.areEqual(0, listaResultado.size(), 'El registro no debería existir , por ende fue eliminado correctamente');
+        List<Proyecto__c> resultList = [SELECT Id FROM Proyecto__c WHERE Id = :project.Id];
+        Assert.areEqual(0, resultList.size(), 'El registro no debería existir , por ende fue eliminado correctamente');
         List<Account> acctsAfter = [SELECT Id, Presupuesto_promedio__c FROM Account WHERE Id = :acct.Id WITH USER_MODE LIMIT 1];
-        Account acctAfterDelete = acctsAfter[0];
-        Assert.areEqual(10000, acctAfterDelete.Presupuesto_promedio__c, 'El promedio de la cuenta debe recalcularse tras afterDelete');
+        Account accountAfterDelete = acctsAfter[0];
+        Assert.areEqual(10000, accountAfterDelete.Presupuesto_promedio__c, 'El promedio de la cuenta debe recalcularse tras afterDelete');
     }
     /**
      * Prueba que un proyecto no se elimine cuando no cumple con las condiciones de eliminación.
      * Verifica que el proyecto no se haya eliminado y que se haya lanzado la excepción esperada.
      */
     @IsTest
-    static void deleteProyectoBorradoFallido(){
+    static void deleteProjectFailTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' LIMIT 1];
         Contact cont = conts[0];
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test2' LIMIT 1];
         User u2 = users[0];
-        Proyecto__c pro = new Proyecto__c(
+        Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
             Contact__C = cont.Id,
             Estado__c = 'Planeado',
             Fecha_de_inicio__c = Date.today()
         );
-        insert pro;
+        insert project;
         System.runAs(u2){
             Test.startTest();
             try {
-                delete pro;
+                delete project;
             }
-            catch (DmlException m) {
-                Assert.isTrue(m.getMessage().contains('No se puede eliminar el record ya que no cumple las condiciones '));
+            catch (DmlException e) {
+                Assert.isTrue(e.getMessage().contains('No se puede eliminar el record ya que no cumple las condiciones '));
             }
             Test.stopTest();
         }
@@ -218,27 +218,27 @@ private class TriggerProyectoHandlerTest {
      * Verifica que el proyecto no se haya eliminado y que se haya lanzado la excepción esperada.
      */
     @IsTest
-    static void deleteProyectoFechaInicioNullTest(){
+    static void deleteProjectNullStartDateTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' LIMIT 1];
         Contact cont = conts[0];
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' LIMIT 1];
         User u = users[0];
-        Proyecto__c pro = new Proyecto__c(
+        Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
             Contact__C = cont.Id,
             Estado__c = 'Planeado'
         );
         System.runAs(u){
-            insert as user pro;
+            insert as user project;
             Test.startTest();
             try {
-                delete as user pro;
+                delete as user project;
             }
-            catch (DmlException m) {
-                Assert.isTrue(m.getMessage().contains('No se puede eliminar el record ya que no cumple las condiciones '));
+            catch (DmlException e) {
+                Assert.isTrue(e.getMessage().contains('No se puede eliminar el record ya que no cumple las condiciones '));
             }
             Test.stopTest();
         }
@@ -249,14 +249,14 @@ private class TriggerProyectoHandlerTest {
      * Verifica que el campo Presupuesto_promedio__c de la cuenta refleje el promedio correcto.
      */
     @IsTest
-    static void actualizarPromedioDeAccount(){
+    static void updateAccountAverageTest(){
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         Account acct = accts[0];
         List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
         Contact cont = conts[0];
         List<User> users = [SELECT Id FROM User WHERE Alias = 'test' LIMIT 1];
         User u = users[0];
-        List<Proyecto__c> proyectos = new List<Proyecto__c>{
+        List<Proyecto__c> projects = new List<Proyecto__c>{
             new Proyecto__c(
                 Name = 'Proyecto1',
                 Account__c = acct.Id,
@@ -272,7 +272,7 @@ private class TriggerProyectoHandlerTest {
             )};
         System.runAs(u) {
             Test.startTest();
-            insert as user proyectos;
+            insert as user projects;
             Test.stopTest();
         }
         List<Account> updatedAccounts = [SELECT Id,Presupuesto_promedio__c FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
@@ -290,7 +290,7 @@ private class TriggerProyectoHandlerTest {
      * Estos datos se utilizarán en las pruebas para validar la funcionalidad relacionada con la cantidad de proyectos activos en una cuenta.
      * @return Un objeto ActivosTestSetup que contiene la cuenta, el contacto y el usuario configurados para las pruebas.
      */
-    private static ActivosTestSetup setupCantidadActivos() {
+    private static ActivosTestSetup setupActiveProjectsLimit() {
         ActivosTestSetup setup = new ActivosTestSetup();
         List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         setup.acct = accts[0];
@@ -307,12 +307,12 @@ private class TriggerProyectoHandlerTest {
      * Verifica que se lance la excepción esperada al intentar crear el segundo proyecto, indicando que se ha superado el límite de proyectos activos.
      */
     @IsTest
-    static void verificarCantidadActivosErrorTest(){
-        ActivosTestSetup setup = setupCantidadActivos();
+    static void validateActiveProjectsLimitErrorTest(){
+        ActivosTestSetup setup = setupActiveProjectsLimit();
         Account acct = setup.acct;
         Contact cont = setup.cont;
         User u = setup.u;
-        List<Proyecto__c> proyectos = new List<Proyecto__c>{
+        List<Proyecto__c> projects = new List<Proyecto__c>{
             new Proyecto__c(
                 Name = 'Proyecto5',
                 Account__c = acct.Id,
@@ -332,10 +332,10 @@ private class TriggerProyectoHandlerTest {
         System.runAs(u){
             try {
                 Test.startTest();
-                insert as user proyectos;
+                insert as user projects;
                 Test.stopTest();
-            } catch (DmlException m) {
-                Assert.isTrue(m.getMessage().contains('No se puede crear el proyecto, la cuenta supera el limite de proyectos activos'));
+            } catch (DmlException e) {
+                Assert.isTrue(e.getMessage().contains('No se puede crear el proyecto, la cuenta supera el limite de proyectos activos'));
             }
         }
     }
@@ -344,12 +344,12 @@ private class TriggerProyectoHandlerTest {
      * Verifica que el proyecto se haya creado correctamente sin lanzar ninguna excepción, indicando que la cuenta no ha superado el límite de proyectos activos.
      * */
     @IsTest
-    static void verificarCantidadActivosExitosoTest(){
-        ActivosTestSetup setup = setupCantidadActivos();
+    static void validateActiveProjectsLimitSuccessTest(){
+        ActivosTestSetup setup = setupActiveProjectsLimit();
         Account acct = setup.acct;
         Contact cont = setup.cont;
         User u = setup.u;
-        List<Proyecto__c> proyectos = new List<Proyecto__c>{
+        List<Proyecto__c> projects = new List<Proyecto__c>{
             new Proyecto__c(
                 Name = 'Proyecto1',
                 Account__c = acct.Id,
@@ -368,10 +368,10 @@ private class TriggerProyectoHandlerTest {
             )};
         System.runAs(u){
             Test.startTest();
-            insert as user proyectos;
+            insert as user projects;
             Test.stopTest();
-            List<Proyecto__c> resultado = [SELECT Id FROM Proyecto__c];
-            Assert.isTrue(resultado.size() == 2);
+            List<Proyecto__c> result = [SELECT Id FROM Proyecto__c];
+            Assert.isTrue(result.size() == 2);
         }
     }
 }
