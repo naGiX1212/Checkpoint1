@@ -1,11 +1,11 @@
 <template>
     <c-account-search onselection={handleAccountSelection}></c-account-search>
     <c-account-info search-id={Record}></c-account-info>
-    <template if:true={idSeleccionado}>
+    <template lwc:if={idSeleccionado}>
         <c-proyecto-data-table record-id={Record} proyecto-creado={ProyectoCreado}></c-proyecto-data-table>
         <c-create-proyecto oncreation={handleCreation}></c-create-proyecto>
     </template>
-    <template if:false={idSeleccionado}>
+    <template lwc:else>
         <lightning-card title="Proyectos">
             <p class="slds-p-around_small">Seleccione una cuenta para ver sus proyectos</p>
         </lightning-card>
