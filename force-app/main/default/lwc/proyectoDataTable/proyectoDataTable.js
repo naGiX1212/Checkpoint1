@@ -1,6 +1,6 @@
 import { LightningElement, wire, api } from 'lwc';
 import { gql, graphql } from "lightning/graphql";
-import deleteProyectoById from '@salesforce/apex/ProyectoController.deleteProyectoById'
+import deleteProjectById from '@salesforce/apex/ProyectoController.deleteProjectById'
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [
@@ -13,7 +13,7 @@ const COLUMNS = [
 export default class ProyectoDataTable extends LightningElement {
     @api recordId;
     @api
-    proyectoRefresh(){
+    refreshProjects(){
         this._refresh();
     }
 
@@ -63,7 +63,7 @@ export default class ProyectoDataTable extends LightningElement {
             accId: this.recordId || null
         };
     }
-    //OBTENGO LOS PROY
+    // GET PROJECTS
     get allProyectos() {
         const dataSalesforce = this._data?.uiapi?.query?.Proyecto__c?.edges;
         const lista = [];
@@ -90,7 +90,7 @@ export default class ProyectoDataTable extends LightningElement {
         if (this.selectorIds.length === 0) return;
 
         try {
-            await deleteProyectoById({ ids: this.selectorIds });
+            await deleteProjectById({ ids: this.selectorIds });
 
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Exito',

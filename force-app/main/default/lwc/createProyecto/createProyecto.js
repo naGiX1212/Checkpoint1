@@ -8,7 +8,7 @@ import FIELD_ESTADO from '@salesforce/schema/Proyecto__c.Estado__c';
 import FIELD_FECHA_INICIO from '@salesforce/schema/Proyecto__c.Fecha_de_inicio__c';
 import FIELD_NUMERO_DE_RECURSOS from '@salesforce/schema/Proyecto__c.Numero_de_Recursos__c';
 import FIELD_PRESUPUESTO from '@salesforce/schema/Proyecto__c.Presupuesto__c';
-export default class CreateAccount extends LightningElement {
+export default class CreateProyecto extends LightningElement {
     objectApiName = PROYECTO_OBJECT;
     fields = [
         FIELD_NAME,FIELD_ACCOUNT,FIELD_CONTACT,
@@ -16,16 +16,15 @@ export default class CreateAccount extends LightningElement {
         FIELD_NUMERO_DE_RECURSOS, FIELD_PRESUPUESTO
     ];
     recordId = undefined;
-    isFormVisible = true;
+    formInstances = [{ key: 0 }];
+
     successHandler(event) {
         this.recordId = event.detail.id;
         this.dispatchEvent(new CustomEvent('creation'));
     }
 
     handleClick() {
-        // Reset manual forzando re-render
-        this.isFormVisible = false;
         this.recordId = undefined;
-        this.isFormVisible = true;
+        this.formInstances = [{ key: this.formInstances[0].key + 1 }];
     }
 }

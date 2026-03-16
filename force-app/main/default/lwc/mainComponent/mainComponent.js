@@ -2,16 +2,18 @@
 import { LightningElement } from 'lwc';
 
 export default class MainComponent extends LightningElement {
-    idSeleccionado;
+    selectedAccountId;
     handleAccountSelection(event) {
-        this.idSeleccionado = event.detail;
+        this.selectedAccountId = event.detail;
     }
     handleCreation() {
-        const proyDt = this.template.querySelector('c-proyecto-data-table');
-        proyDt.proyectoRefresh();
+        const projectDataTable = this.template.querySelector('c-proyecto-data-table');
+        if (projectDataTable) {
+            projectDataTable.refreshProjects();
+        }
     }
 
     get Record() {
-        return this.idSeleccionado;
+        return this.selectedAccountId;
     }
 }

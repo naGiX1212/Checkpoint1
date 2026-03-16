@@ -13,7 +13,7 @@ trigger TriggerProyecto on Proyecto__c (before insert,after insert , after updat
             TriggerProyectoHandler.deleteIfOldAndPlanned(Trigger.old);
         }
         when AFTER_DELETE {
-            TriggerProyectoHandler.updateAccountAverageAfterDelete(Trigger.old);
+            TriggerProyectoHandler.updateAccountBudgetAverageAfterDelete(Trigger.old);
         }
     }
 }

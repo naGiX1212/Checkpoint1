@@ -18,7 +18,9 @@ public with sharing class ProyectoController {
                 delete as user projects;
             }
             } catch (Exception m) {
-                throw  new AuraHandledException(m.getMessage());
+                AuraHandledException ex = new AuraHandledException(m.getMessage());
+                ex.setMessage(m.getMessage());
+                throw ex;
             }
     }
 }

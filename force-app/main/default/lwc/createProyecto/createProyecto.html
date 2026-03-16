@@ -7,8 +7,9 @@
         </div>
 
         <div class="slds-p-around_medium">
-            <template lwc:if={isFormVisible}> 
+            <template for:each={formInstances} for:item="form">
                 <lightning-record-form
+                    key={form.key}
                     object-api-name={objectApiName}
                     fields={fields}
                     onsuccess={successHandler}>

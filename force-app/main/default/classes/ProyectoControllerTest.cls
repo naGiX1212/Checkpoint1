@@ -7,8 +7,8 @@ private class ProyectoControllerTest {
 
     /**
      * Configura los datos de prueba necesarios para las pruebas unitarias.
-     * Crea dos usuarios con perfil de administrador, asigna el permission set
-     * Bypass_Validation_Rules al primero, y genera una cuenta con un contacto asociado.
+     * Crea un usuario con perfil de administrador, asigna el permission set
+     * Bypass_Validation_Rules y genera una cuenta con un contacto asociado.
      */
     @TestSetup
     static void makeData(){
@@ -28,19 +28,7 @@ private class ProyectoControllerTest {
                 TimeZoneSidKey = 'America/Los_Angeles',
                 UserName = 'test' + DateTime.now().getTime() + '@test.com'
             );
-            User u2 = new User(
-                Alias = 'test2',
-                Email = 'test2user@example.com',
-                EmailEncodingKey = 'UTF-8',
-                LastName = 'asd',
-                LanguageLocaleKey = 'en_US',
-                LocaleSidKey = 'en_US',
-                ProfileId = p.Id,
-                TimeZoneSidKey = 'America/Los_Angeles',
-                UserName = 'test2' + DateTime.now().getTime() + '@test.com'
-            );
-            List<User> users = new List<User>{u,u2};
-            insert users;
+            insert u;
             List<PermissionSet> permSets = [SELECT Id FROM PermissionSet WHERE Name = 'Bypass_Validation_Rules' LIMIT 1];
             PermissionSet ps = permSets[0];
             insert new PermissionSetAssignment(
@@ -59,7 +47,7 @@ private class ProyectoControllerTest {
         }
     }
 
-    /** Clase auxiliar que agrupa los datos de prueba comunes para los tests de eliminación. */
+    /** Helper que agrupa los datos de prueba comunes para los tests. */
     private class DeleteTestSetup {
         Account acct;
         Contact cont;
@@ -72,11 +60,11 @@ private class ProyectoControllerTest {
      */
     private static DeleteTestSetup setupDeleteTest() {
         DeleteTestSetup setup = new DeleteTestSetup();
-        List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' LIMIT 1];
+        List<Account> accts = [SELECT Id FROM Account WHERE Name = 'AccountTest' WITH USER_MODE LIMIT 1];
         setup.acct = accts[0];
-        List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' LIMIT 1];
+        List<Contact> conts = [SELECT Id FROM Contact WHERE LastName = 'ContactTest' WITH USER_MODE LIMIT 1];
         setup.cont = conts[0];
-        List<User> users = [SELECT Id FROM User WHERE Alias = 'test' LIMIT 1];
+        List<User> users = [SELECT Id FROM User WHERE Alias = 'test' WITH USER_MODE LIMIT 1];
         setup.u = users[0];
         return setup;
     }
@@ -129,16 +117,19 @@ private class ProyectoControllerTest {
             Fecha_de_inicio__c = Date.today(),
             Estado__c = 'Planeado'
         );
+        Boolean exceptionThrown = false;
         System.runAs(u) {
             insert project;
             List<Id> ids = new List<Id>{ project.Id };
             Test.startTest();
             try {
                 ProyectoController.deleteProjectById(ids);
+                Assert.fail('Se esperaba una AuraHandledException pero no se lanzó ninguna excepción');
             } catch (AuraHandledException e) {
-                Assert.isNotNull(e.getMessage());
+                exceptionThrown = true;
             }
             Test.stopTest();
         }
+        Assert.isTrue(exceptionThrown, 'Se espera una AuraHandledException');
     }
 }

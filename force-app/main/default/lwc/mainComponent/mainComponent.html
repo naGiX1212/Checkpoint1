@@ -1,8 +1,8 @@
 <template>
     <c-account-search onselection={handleAccountSelection}></c-account-search>
     <c-account-info search-id={Record}></c-account-info>
-    <template lwc:if={idSeleccionado}>
-        <c-proyecto-data-table record-id={Record} proyecto-creado={ProyectoCreado}></c-proyecto-data-table>
+    <template lwc:if={selectedAccountId}>
+        <c-proyecto-data-table record-id={Record}></c-proyecto-data-table>
         <c-create-proyecto oncreation={handleCreation}></c-create-proyecto>
     </template>
     <template lwc:else>

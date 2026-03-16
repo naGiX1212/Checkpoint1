@@ -1,5 +1,6 @@
 /**
  * Handler de trigger para el objeto Proyecto__c,
+ * @author Joel Murillo
  */
 public with sharing class TriggerProyectoHandler {
     /**
@@ -11,7 +12,7 @@ public with sharing class TriggerProyectoHandler {
     public static void updateContactDescriptionForHighBudget(List<Proyecto__c> projects){
         Map<Id,Contact> contactMap = new Map<Id,Contact>();
         for(Proyecto__c project : projects){
-            if(project.Presupuesto__c > 50000){
+            if(project.Contact__c != null && project.Presupuesto__c > 50000){
                 contactMap.put(project.Contact__c,new Contact(Id = project.Contact__c , Descripcion__c ='Este contacto está asociado con un proyecto con presupuesto alto.'));
             }
         }
@@ -45,7 +46,8 @@ public with sharing class TriggerProyectoHandler {
             accountActiveCount.put(accountItem.Id,accountItem.Proyectos__r.size());
         }
         for(Proyecto__c projectItem : projectsInProgress){
-            if(accountActiveCount.get(projectItem.Account__c) >= accountsInProgress.get(projectItem.Account__c).Maximo_de_proyectos_activos__c){
+            Integer maxActive = (Integer) accountsInProgress.get(projectItem.Account__c).Maximo_de_proyectos_activos__c;
+            if(maxActive != null && accountActiveCount.get(projectItem.Account__c) >= maxActive){
                 projectItem.addError('No se puede crear el proyecto, la cuenta supera el limite de proyectos activos');
             }
             else {
@@ -56,11 +58,11 @@ public with sharing class TriggerProyectoHandler {
     /**
      * Valida que los proyectos que se van a eliminar cumplan con las condiciones
      * que esten en estado 'Planeado' y el anio de antiguedad del proyecto sea mayor a 1 anio
-     * @param before Lista de proyectos antes de la eliminación
+     * @param projectsToDelete Lista de proyectos antes de la eliminación
      */
     public static void deleteIfOldAndPlanned(List<Proyecto__c> projectsToDelete) {
         for(Proyecto__c projectItem : projectsToDelete) {
-            Boolean isOldAndPlanned = projectItem.Estado__c == 'Planeado' && projectItem.Fecha_de_inicio__c != null && projectItem.Fecha_de_inicio__c.year() <= Date.today().addYears(-1).year();
+            Boolean isOldAndPlanned = projectItem.Estado__c == 'Planeado' && projectItem.Fecha_de_inicio__c != null && projectItem.Fecha_de_inicio__c <= Date.today().addYears(-1);
             if(!isOldAndPlanned) {
                 projectItem.addError('No se puede eliminar el record ya que no cumple las condiciones (Planeado y antiguo)');
             }
@@ -88,15 +90,23 @@ public with sharing class TriggerProyectoHandler {
                                            WITH USER_MODE
                                            GROUP BY Account__c
                                            ];
+        Set<Id> accountsWithActiveProjects = new Set<Id>();
         for(AggregateResult average : averages){
+            Id accountId = (Id)average.get('Account__c');
+            accountsWithActiveProjects.add(accountId);
             accountsToUpdate.add(
                 new Account(
-                    Id = (Id)average.get('Account__c'),
+                    Id = accountId,
                     Presupuesto_promedio__c = (Decimal)average.get('promedio')
                 )
             );
         }
-        if(accountsToUpdate.size() > 0){
+        for(Id accountId : accountIds){
+            if(!accountsWithActiveProjects.contains(accountId)){
+                accountsToUpdate.add(new Account(Id = accountId, Presupuesto_promedio__c = null));
+            }
+        }
+        if(!accountsToUpdate.isEmpty()){
             update as user accountsToUpdate;
         }
     }

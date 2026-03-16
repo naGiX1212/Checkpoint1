@@ -161,7 +161,7 @@ private class TriggerProyectoHandlerTest {
         Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
-            Contact__C = cont.Id,
+            Contact__c = cont.Id,
             Estado__c = 'Planeado',
             Fecha_de_inicio__c = Date.today().addYears(-1)
         );
@@ -196,7 +196,7 @@ private class TriggerProyectoHandlerTest {
         Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
-            Contact__C = cont.Id,
+            Contact__c = cont.Id,
             Estado__c = 'Planeado',
             Fecha_de_inicio__c = Date.today()
         );
@@ -228,7 +228,7 @@ private class TriggerProyectoHandlerTest {
         Proyecto__c project = new Proyecto__c(
             Name = 'Proyecto',
             Account__c = acct.Id,
-            Contact__C = cont.Id,
+            Contact__c = cont.Id,
             Estado__c = 'Planeado'
         );
         System.runAs(u){
@@ -260,13 +260,13 @@ private class TriggerProyectoHandlerTest {
             new Proyecto__c(
                 Name = 'Proyecto1',
                 Account__c = acct.Id,
-                Contact__C = cont.Id,
+                Contact__c = cont.Id,
                 Estado__c = 'En Progreso',
                 Presupuesto__c = 20000),
             new Proyecto__c(
                 Name = 'Proyecto2',
                 Account__c = acct.Id,
-                Contact__C = cont.Id,
+                Contact__c = cont.Id,
                 Estado__c = 'En Progreso',
                 Presupuesto__c = 15000
             )};
@@ -316,7 +316,7 @@ private class TriggerProyectoHandlerTest {
             new Proyecto__c(
                 Name = 'Proyecto5',
                 Account__c = acct.Id,
-                Contact__C = cont.Id,
+                Contact__c = cont.Id,
                 Estado__c = 'En Progreso',
                 Presupuesto__c = 20000,
                 Fecha_de_inicio__c = Date.today().addYears(-1)
@@ -353,7 +353,7 @@ private class TriggerProyectoHandlerTest {
             new Proyecto__c(
                 Name = 'Proyecto1',
                 Account__c = acct.Id,
-                Contact__C = cont.Id,
+                Contact__c = cont.Id,
                 Estado__c = 'En Progreso',
                 Presupuesto__c = 20000,
                 Fecha_de_inicio__c = Date.today().addYears(-1)

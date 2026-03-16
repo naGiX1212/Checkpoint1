@@ -41,7 +41,7 @@ export default class AccountInfo extends LightningElement {
     }
 
     get totalRecursos() {
-        const proyectos = this.account.data?.uiapi.query.Account.edges[0]?.node.Proyectos__r.edges;
+        const proyectos = this.account.data?.uiapi?.query?.Account?.edges?.[0]?.node?.Proyectos__r?.edges;
         let total = 0;
         if(proyectos){
             for(const item of proyectos){
